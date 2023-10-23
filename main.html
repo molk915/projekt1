@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteka Audio</title>
+</head>
+<body>
+    <div class="navbar"></div>
+    <div class="text1">
+    <h1>Biblioteka Audio</h1>
+</div>
+    <div class="tabela">
+    <table>
+        <thead>
+            <tr>
+                <th>Tytuł</th>
+                <th>Artysta</th>
+                <th>Gatunek</th>
+                <th>Tempo (BPM)</th>
+                <th>Czas trwania</th>
+                <th>Ulubione</th>
+            </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+    </table>
+    </div>
+</body>
+<script>
+    const SongsUrl = 'https://gist.githubusercontent.com/techniadrian/c39f844edbacee0439bfeb107227325b/raw/81eec7847b1b3dfa1c7031586405c93e9a9c1a2d/songs.json';
+
+    async function fetchData() {
+        const response = await fetch(SongsUrl);
+        const data = await response.json();
+
+        const tableBody = document.getElementById('table-body');
+        
+        data.forEach(song => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${song.title}</td>
+                <td>${song.artist}</td>
+                <td>${song.genre}</td>
+                <td>${song.bpm}</td>
+                <td>${song.duration}</td>
+                <td>${song.favorite ? 'Tak' : 'Nie'}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    fetchData();
+</script>
+</html>
