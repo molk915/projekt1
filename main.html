@@ -7,24 +7,31 @@
     <title>Biblioteka Audio</title>
 </head>
 <body>
-    <div class="navbar"></div>
-    <div class="text1">
-    <h1>Biblioteka Audio</h1>
+    <div class="navbar">
+    <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Browse</a></li>
+        <li><a href="#">Search</a></li>
+        <li><a href="#">Your Library</a></li>
+    </ul>
 </div>
-    <div class="tabela">
-    <table>
-        <thead>
-            <tr>
-                <th>Tytuł</th>
-                <th>Artysta</th>
-                <th>Gatunek</th>
-                <th>Tempo (BPM)</th>
-                <th>Czas trwania</th>
-                <th>Ulubione</th>
-            </tr>
-        </thead>
-        <tbody id="table-body"></tbody>
-    </table>
+
+    <div class="text1">
+        <h1>spotify or something idk    </h1>
+    </div>
+
+<div class="sort-buttons">
+    <button id="sort-by-title">Sortuj wg tytułu</button>
+    <button id="sort-by-artist">Sortuj wg artysty</button>
+    <button id="show-favorites">Pokaż ulubione</button>
+  </div>
+  <div class="favorites">
+    <h2>Ulubione Piosenki</h2>
+    <div class="favorites-list">
+    </div>
+  </div>
+  
+    <div class="songs-list">
     </div>
 </body>
 <script>
@@ -34,20 +41,123 @@
         const response = await fetch(SongsUrl);
         const data = await response.json();
 
-        const tableBody = document.getElementById('table-body');
+        const songsList = document.querySelector('.songs-list');
         
         data.forEach(song => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${song.title}</td>
-                <td>${song.artist}</td>
-                <td>${song.genre}</td>
-                <td>${song.bpm}</td>
-                <td>${song.duration}</td>
-                <td>${song.favorite ? 'Tak' : 'Nie'}</td>
+            const songDiv = document.createElement('div');
+            songDiv.classList.add('song-item');
+            songDiv.innerHTML = `
+                <h2>${song.title}</h2>
+                <p>Artysta: ${song.artist}</p>
+                <p>Gatunek: ${song.genre}</p>
+                <p>Tempo (BPM): ${song.bpm}</p>
+                <p>Czas trwania: ${song.duration}</p>
+                <p>Ulubione: ${song.favorite ? 'Tak' : 'Nie'}</p>
             `;
-            tableBody.appendChild(row);
+            songsList.appendChild(songDiv);
         });
+        const SongsData =  'https://gist.githubusercontent.com/techniadrian/c39f844edbacee0439bfeb107227325b/raw/81eec7847b1b3dfa1c7031586405c93e9a9c1a2d/songs.json'
+const GenresData = 'https://gist.githubusercontent.com/techniadrian/6ccdb1c837d431bb84c2dfedbec2e435/raw/60783ebfa89c6fd658aaf556b9f7162553ac0729/genres.json'
+const sortButtons 
+= document.querySelector('.sort-buttons');
+const sortByTitleButton = document.querySelector('#sort-by-title');
+const sortByArtistButton = document.querySelector('#sort-by-artist');
+const showFavoritesButton = document.querySelector('#show-favorites');
+const favoritesSection = document.querySelector('.favorites');
+const favoritesList = document.querySelector('.favorites-list');
+
+let songsData = [];
+let displayedSongs = [];
+let favorites = [];
+
+async function fetchData() {
+  const response = await fetch(SongsUrl);
+  songsData = await response.json();
+  displayedSongs = [...songsData];
+  updateSongsList();
+}
+
+function updateSongsList() {
+  const songsList = document.querySelector('.songs-list');
+  songsList.innerHTML = '';
+
+  displayedSongs.forEach(song => {
+    const songDiv = document.createElement('div');
+    songDiv.classList.add('song-item');
+
+    const favoriteButton = document.createElement('button');
+    favoriteButton.textContent = favorites.includes(song.title) ? 'Usuń z ulubionych' : 'Dodaj do ulubionych';
+    favoriteButton.addEventListener('click', () => toggleFavorite(song.title));
+
+    songDiv.innerHTML = `
+        <h2>${song.title}</h2>
+        <p>Artysta: ${song.artist}</p>
+        <p>Gatunek: ${song.genre}</p>
+        <p>Tempo (BPM): ${song.bpm}</p>
+        <p>Czas trwania: ${song.duration}</p>
+    `;
+
+    songDiv.appendChild(favoriteButton);
+    songsList.appendChild(songDiv);
+  });
+}
+
+function toggleFavorite(songTitle) {
+  if (favorites.includes(songTitle)) {
+    const index = favorites.indexOf(songTitle);
+    favorites.splice(index, 1);
+  } else {
+    favorites.push(songTitle);
+  }
+
+  updateSongsList();
+  updateFavorites();
+}
+
+function updateFavorites() {
+  const favoriteSongs = songsData.filter(song => favorites.includes(song.title));
+
+  favoritesList.innerHTML = '';
+  favoriteSongs.forEach(song => {
+    const songDiv = document.createElement('div');
+    songDiv.classList.add('song-item');
+    songDiv.innerHTML = `
+        <h2>${song.title}</h2>
+        <p>Artysta: ${song.artists}</p>
+        <p>Gatunek: ${song.genre}</p>
+        <p>Tempo (BPM): ${song.bpm}</p>
+        <p>Czas trwania: ${song.duration}</p>
+        <p>Ulubione: Tak</p>
+    `;
+    favoritesList.appendChild(songDiv);
+  });
+
+  if (favorites.length > 0) {
+    favoritesSection.style.display = 'block';
+  } else {
+    favoritesSection.style.display = 'none';
+  }
+}
+
+sortByTitleButton.addEventListener('click', () => {
+  displayedSongs = [...songsData];
+  displayedSongs.sort((a, b) => a.title.localeCompare(b.title));
+  updateSongsList();
+});
+
+sortByArtistButton.addEventListener('click', () => {
+  displayedSongs = [...songsData];
+  displayedSongs.sort((a, b) => a.artist.localeCompare(b.artists));
+  updateSongsList();
+});
+
+showFavoritesButton.addEventListener('click', () => {
+  displayedSongs = songsData.filter(song => favorites.includes(song.title));
+  updateSongsList();
+});
+
+fetchData();
+
     }
 
     fetchData();
