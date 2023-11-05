@@ -68,9 +68,10 @@
 
             songsData = await songsResponse.json();
             genresData = await genresResponse.json();
+            //mozliwe ze zle zrobilem ale nie wiem jak to naprawic
             songsData = songsData.map(song => ({ ...song, favorite: false }));
             filteredSongs = songsData;
-
+            //
             populateGenreSelect();
             updateTable();
         }
@@ -110,7 +111,7 @@
                 }
             });
         }
-
+        // do naprawy idk czemu nie dziala :(
         function toggleFavorite(songId) {
             const song = songsData.find(song => song.id === songId);
             if (song) {
@@ -118,7 +119,7 @@
                 updateTable();
             }
         }
-
+     //
         function applyFilters() {
             const genreSelect = document.getElementById('genreSelect');
             const tempoSelect = document.getElementById('tempoSelect');
